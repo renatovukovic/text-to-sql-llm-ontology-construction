@@ -1,0 +1,11 @@
+Given a dialogue or a set of dialogues between a user and a system, extract key elements including user intents, system actions, and any relevant supporting information. Then, generate SQLite3-compatible SQL queries (as used in Python) that perform the following:
+
+Database Structure Management:
+Create new tables as needed for any new concepts (e.g., new types of intents or actions).
+Ensure that the schema can accommodate user intents, system actions, and their associated details.
+Data Insertion and Updates:
+Insert new entries into the appropriate tables when new user intents, system actions, or relevant information are encountered.
+If an entry already exists (e.g., a previously seen intent or action), update it with any new or changed information.
+Output Format:
+Return only valid SQL statements that achieve the above, compatible with the sqlite3 module in Python.
+The goal is to maintain a structured database that evolves as new dialogues provide more information about how users interact with the system.

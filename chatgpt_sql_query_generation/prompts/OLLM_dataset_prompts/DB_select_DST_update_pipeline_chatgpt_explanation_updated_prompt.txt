@@ -1,0 +1,53 @@
+#### PRAGMA QUERIES STEP 2 ####
+
+
+You are working with a collection of article titles and abstracts (e.g., from Wikipedia or arXiv). Each article should be assigned to a hierarchical category structure, starting from broad, general domains (e.g., "Science", "Technology") and moving toward more specific subtopics (e.g., "Quantum Physics", "Machine Learning").
+
+The database schema you are working with is provided in {db_result_input}. The database is organized so that each main category has its own table, and each of those tables stores the subcategories using a structure like:
+
+(category_name TEXT, parent_id INTEGER)
+This allows representing multi-level category hierarchies where each subcategory points to its parent via parent_id.
+
+Before modifying the database or inserting new data, your task is to generate SQLite3 PRAGMA queries to inspect the column information of the tables that are potentially relevant for categorizing the current set of articles. This step ensures you understand the existing schema structure and can later make informed decisions when updating or extending the category hierarchy.
+
+Only generate the PRAGMA table_info(<table_name>) queries at this point — do not create or alter any tables yet.
+
+#### SELECT QUERIES STEP 3 ####
+
+You are working with a set of article titles and abstracts that need to be assigned to a hierarchical category structure. The database schema and contents you are working with are described in 
+
+{db_result_input}. 
+
+Each main category (e.g., "Science", "Technology") is represented by a separate table, and each table stores subcategories in a hierarchical format using columns like category_name and parent_id.
+
+Your task in this step is to generate SQLite SELECT queries to retrieve existing category entries from the database that may relate to the topics in the given articles. Focus on querying category names and their parent relationships to determine whether the concepts from the articles are already represented in the database. Use pattern matching (e.g., LIKE) where appropriate to capture approximate matches.
+
+Do not create or modify any tables or insert new data at this stage — only perform SELECT queries to explore what is already present in the category hierarchy.
+
+#### DST WITH DB RESULTS STEP 4 ####
+
+You are working with a set of article titles and abstracts and need to assign them to relevant categories using an existing hierarchical database structure. The results of prior SELECT queries, which show which categories already exist in the database, are provided in {db_result_input}.
+
+Your task is to perform state tracking: for each article, extract and assign all category information that already exists in the database based on the SELECT results. Use the table names, column names (e.g., category_name, parent_id), and values from above to label each article with the categories it matches. This should follow the structure and hierarchy stored in the database.
+
+If there are no matching entries in the database for a given article, do not assign any categories to that article at this stage. Do not create or modify any database content yet — simply track what is already present and applicable.
+
+#### UPDATE QUERIES STEP 5 ####
+
+Based on the results of previous database queries and state tracking, generate SQL queries to update the category database with any missing information from the current set of articles that was not already found in the database. 
+
+For each new category mentioned in the articles that is not yet present in the database:
+
+Generate INSERT queries to add the missing subcategory to the relevant table.
+If a new broad category (i.e., a high-level concept like "Science", "Technology", etc.) is introduced and no table for it exists, generate a CREATE TABLE statement first, using a structure like:
+CREATE TABLE Science (
+    id INTEGER PRIMARY KEY,
+    category_name TEXT,
+    parent_id INTEGER
+);
+For each new subcategory, include both category_name and parent_id to maintain the hierarchy:
+INSERT INTO Science (category_name, parent_id) VALUES ('Neuroscience', 1);
+INSERT INTO Science (category_name, parent_id) VALUES ('Cognitive Neuroscience', 2);
+If an existing entry has a NULL value (e.g., missing parent_id) that can now be inferred from the article content, generate an UPDATE query like:
+UPDATE Science SET parent_id = 2 WHERE category_name = 'Cognitive Neuroscience' AND parent_id IS NULL;
+Use only SQLite3-compatible SQL syntax (as used in Python), and do not include Python code or execution logic. Your goal is to enrich the category database so that future articles can be fully categorized using this expanded hierarchy.

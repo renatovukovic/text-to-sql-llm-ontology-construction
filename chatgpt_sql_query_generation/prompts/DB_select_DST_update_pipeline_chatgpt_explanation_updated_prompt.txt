@@ -1,0 +1,81 @@
+#### PRAGMA QUERIES STEP 2 ####
+
+You're working with a dialogue system that stores structured data from conversations in an SQLite3 database. The database includes tables covering user intents, system actions, and information about various entities.
+
+You will be provided with two inputs:
+
+the current set of database tables and their names (but not their schemas).
+New dialogue(s) – this contains user and system turns with references to specific intents, actions, or queried information.
+Your task:
+
+Identify which tables from {db_result_input} are relevant to the new dialogue(s) based on:
+User intents expressed in the dialogue(s).
+System actions performed in response.
+Specific information or entities being queried or discussed.
+For each relevant table, generate the following SQLite command to inspect its schema:
+PRAGMA table_info(<table_name>);
+This will allow you to understand the structure (columns and data types) of the tables you will be working with.
+⚠️ Do not create or modify tables yet — only inspect existing ones using PRAGMA.
+
+#### SELECT QUERIES STEP 3 ####
+
+You’ve already examined the database schema using PRAGMA table_info(...) queries. The schema details are provided, which contain the structure (columns and types) of the current tables in the SQLite3 database.
+
+Now, based on the same dialogue and the table definitions, your task is to:
+
+✅ Generate SQL SELECT queries to retrieve:
+User intents expressed in the dialogue — in general form (e.g., find_flight, book_hotel) without including specific parameters (e.g., cities, dates).
+Use the table column schema to determine which table holds this information and write a query to retrieve matching intents:
+
+{db_result_input}
+
+System actions carried out in the dialogue — again in a generalized form (e.g., recommend, confirm, inform).
+Use the appropriate table from above and generate a query to retrieve those action types.
+Information explicitly requested by the user — such as facts about entities (e.g., list of Italian restaurants, hotel prices, flight times), but only if that data is already present in the database.
+Generate SELECT queries from the relevant tables, based on what was asked in the dialogue.
+🚫 Do not:
+Create or alter tables (no CREATE, INSERT, or UPDATE).
+Use timestamp fields or session-specific filters.
+Use specific slot values from the dialogue (e.g., exact restaurant names or locations) in the intent or action queries — keep them general.
+
+#### DST WITH DB RESULTS STEP 4 ####
+
+You’ve already run a set of SELECT queries based on the previous dialogue, and the results of those queries are provided in the following. These results represent all the information currently stored in the database that matches the dialogue.
+
+{db_result_input}
+
+Your task now is to perform Dialogue State Tracking (DST) by extracting structured information from the dialogue — but only if that information is already present in the database, as confirmed by the query results.
+
+✅ Specifically:
+Use the dialogue to identify user intents, system actions, and information about entities (e.g., preferences, attributes, categories).
+For each matching element, only include it in the tracked state if it appears in the DB results above.
+Represent the extracted state using a table → column → value structure, reflecting exactly how the information maps to the current database.
+🚫 Do not:
+Track or infer values that do not exist in the current DB results.
+Use placeholder values or hypothetical interpretations.
+Modify, insert, or extend the database structure in any way.
+Your output should reflect only what is both:
+
+Mentioned in the dialogue, and
+Already stored in the database results above.
+
+#### UPDATE QUERIES STEP 5 ####
+
+You’ve already reviewed the results of previous SELECT queries and performed Dialogue State Tracking (DST) based on the dialogue. The structure and current content of the database are provided above.
+
+Now, your task is to identify which information from the dialogue was not yet present in the database — and generate the necessary SQLite3 SQL queries (not Python code) to add it.
+
+✅ Specifically, generate SQL statements to:
+Insert missing user intents from the dialogue into the appropriate intent table, using general intent types (e.g., book_hotel, find_restaurant), not slot values.
+Insert missing system actions seen in the dialogue into the system actions table, again using generalized forms (e.g., recommend, confirm).
+Insert missing entity records or values:
+If an entity mentioned in the dialogue doesn’t exist in the relevant table, generate an INSERT.
+If an existing entity has NULL or empty fields that are filled in by the dialogue, generate an UPDATE.
+Modify the schema if needed:
+If the dialogue introduces a new type of information (e.g., a new attribute or category) not reflected in the DB results above, generate a CREATE TABLE or ALTER TABLE query accordingly.
+🚫 Do not:
+Generate Python code (e.g., cursor.execute(...)) — only write raw SQL queries.
+Include timestamps or session data.
+Repeat or overwrite existing non-NULL values.
+Add user intents or system actions using dialogue-specific slot values — they should remain generalized.
+Make sure to have tables for different types of entities, e.g. a restaurants table, etc. and not one table for all entities.
